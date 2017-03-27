@@ -3,7 +3,7 @@ const ns = require('util-news-selectors');
 
 const slice = Array.prototype.slice;
 
-const COLOR_LINE = '#CCC';
+const COLOR_LINE = '#333';
 const COLOR_MIN = '#00CED5';
 const COLOR_MAX = '#B7004E';
 // const COLOR_MAX = '#F8076D';
@@ -106,13 +106,13 @@ meta.colorScale = d3.scale.linear().domain([meta.minGust, meta.maxGust])
 // <div class="DebbieTracker-rainfall"><div id="DebbieTracker-rainfall-${place.slug}">${place.rainfall}</div></div>
 const appEl = html`
   <div class="DebbieTracker">
-    <div class="DebbieTracker-marker" style="left: 7.25%">
+    <div class="DebbieTracker-marker" style="left: 6%">
       <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
     </div>
     <div class="DebbieTracker-marker" style="left: 49.25%">
       <div class="DebbieTracker-marker-label">${meta.gustTimes[Math.floor(meta.gustTimes.length / 2)]}</div>
     </div>
-    <div class="DebbieTracker-marker" style="left: 91.25%">
+    <div class="DebbieTracker-marker" style="left: 92.75%">
       <div class="DebbieTracker-marker-label">${meta.gustTimes[meta.gustTimes.length - 1]}</div>
     </div>
     <div class="DebbieTracker-places">
@@ -160,9 +160,9 @@ places.forEach(place => {
               return `${d} km/h`;
             }
 
-            if (d === place.maxGust) {
-              return `${d} km/h`;
-            }
+            // if (d === place.maxGust) {
+            //   return `${d} km/h`;
+            // }
 
             return '';
           }
@@ -208,10 +208,12 @@ places.forEach(place => {
         _d[0].forEach(d => {
           d3.select(d)
           .style('opacity', c => {
-            return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
+            // return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
+            return c.x === meta.numGusts - 1 ? 1 : 0;
           });
         })
       });
+      x.selectAll('clipPath').remove();
     });
   }, 250);
 });
