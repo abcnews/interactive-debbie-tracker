@@ -1,0 +1,23 @@
+{
+  "name": "interactive-debbie-tracker",
+  "version": "1.0.0",
+  "description": "A basic ABC News story.",
+  "license": "MIT",
+  "private": true,
+  "contributors": [
+    "Colin Gourlay <Gourlay.Colin@abc.net.au>"
+  ],
+  "scripts": {
+    "start": "npm install && aunty serve --debug"
+  },
+  "dependencies": {
+    "bel": "^4.6.0",
+    "util-news-selectors": "git+ssh://git@stash.abc-dev.net.au:7999/news/util-news-selectors.git#2.3.0"
+  },
+  "devDependencies": {
+    "@abcnews/aunty": "2.2.x"
+  },
+  "aunty": {
+    "type": "basic-story"
+  }
+}
