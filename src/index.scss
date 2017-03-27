@@ -65,7 +65,7 @@ $rainfall-width: 56px;
   margin: 20px 0 0;
   border-radius: 3px;
   border: 1px solid #ddd;
-  padding: 7px 2px 3px;
+  padding: 8px 2px 4px;
   width: $rainfall-width;
   color: #666;
   font-size: 11px;
@@ -78,11 +78,11 @@ $rainfall-width: 56px;
   font-family: $font-sans;
   font-size: 16px;
   font-weight: bold;
-  line-height: 0.6;
+  line-height: 0.65;
 }
 
 .DebbieTracker-rainfall-units {
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   color: #666;
   font-family: $font-sans;
   font-size: 14px;

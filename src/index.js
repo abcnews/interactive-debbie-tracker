@@ -92,14 +92,23 @@ const meta = places.reduce((memo, place) => {
     memo.maxRainfall = place.rainfall;
   }
 
+  if (place.rainfall !== null && place.rainfall < memo.minRainfall) {
+    memo.minRainfall = place.rainfall;
+  }
+
   return memo;
 }, {
   maxGust: -Infinity,
   minGust: Infinity,
-  maxRainfall: 0
+  maxRainfall: -Infinity,
+  minRainfall: Infinity
 });
 
-meta.colorScale = d3.scale.linear().domain([meta.minGust, meta.maxGust])
+meta.gustColorScale = d3.scale.linear().domain([meta.minGust, meta.maxGust])
+  .interpolate(d3.interpolateHcl)
+  .range([d3.rgb(COLOR_MIN), d3.rgb(COLOR_MAX)]);
+
+meta.rainfallColorScale = d3.scale.linear().domain([meta.minRainfall, meta.maxRainfall])
   .interpolate(d3.interpolateHcl)
   .range([d3.rgb(COLOR_MIN), d3.rgb(COLOR_MAX)]);
 
@@ -121,7 +130,7 @@ const appEl = html`
         <div class="DebbieTracker-place">
           <h2 class="DebbieTracker-name">${place.name}</h2>
           ${place.rainfall === null ? null : html`<div class="DebbieTracker-rainfall">
-            <div class="DebbieTracker-rainfall-value">${place.rainfall}</div>
+            <div class="DebbieTracker-rainfall-value" style="color: ${meta.rainfallColorScale(place.rainfall)}">${place.rainfall}</div>
             <div class="DebbieTracker-rainfall-units">mm</div>
             <div class="DebbieTracker-rainfall-context">rainfall since midnight</div>
           </div>`}
@@ -157,7 +166,7 @@ places.forEach(place => {
           return COLOR_LINE;
         }
 
-        return meta.colorScale(d.value);
+        return meta.gustColorScale(d.value);
       },
       labels: {
         format: {
