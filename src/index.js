@@ -43,7 +43,7 @@ slice.call(tableEls[0].rows).forEach((row, rowIndex) => {
         });
         break;
       case 1:
-        places[colIndex].rainfall = (+cell.innerHTML);
+        places[colIndex].rainfall = cell.innerHTML === '-' ? null : +cell.innerHTML;
         break;
       default:
         break;
@@ -88,7 +88,7 @@ const meta = places.reduce((memo, place) => {
     memo.minGust = place.minGust;
   }
 
-  if (place.rainfall > memo.maxRainfall) {
+  if (place.rainfall !== null && place.rainfall > memo.maxRainfall) {
     memo.maxRainfall = place.rainfall;
   }
 
@@ -103,22 +103,28 @@ meta.colorScale = d3.scale.linear().domain([meta.minGust, meta.maxGust])
   .interpolate(d3.interpolateHcl)
   .range([d3.rgb(COLOR_MIN), d3.rgb(COLOR_MAX)]);
 
-// <div class="DebbieTracker-rainfall"><div id="DebbieTracker-rainfall-${place.slug}">${place.rainfall}</div></div>
 const appEl = html`
   <div class="DebbieTracker">
-    <div class="DebbieTracker-marker" style="left: 6%">
-      <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
-    </div>
-    <div class="DebbieTracker-marker" style="left: 49.25%">
-      <div class="DebbieTracker-marker-label">${meta.gustTimes[Math.floor(meta.gustTimes.length / 2)]}</div>
-    </div>
-    <div class="DebbieTracker-marker" style="left: 92.75%">
-      <div class="DebbieTracker-marker-label">${meta.gustTimes[meta.gustTimes.length - 1]}</div>
+    <div class="DebbieTracker-markers">
+      <div class="DebbieTracker-marker" style="left: 6%">
+        <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
+      </div>
+      <div class="DebbieTracker-marker" style="left: 49.25%">
+        <div class="DebbieTracker-marker-label">${meta.gustTimes[Math.floor(meta.gustTimes.length / 2)]}</div>
+      </div>
+      <div class="DebbieTracker-marker" style="left: 92.75%">
+        <div class="DebbieTracker-marker-label">${meta.gustTimes[meta.gustTimes.length - 1]}</div>
+      </div>
     </div>
     <div class="DebbieTracker-places">
       ${places.map(place => html`
         <div class="DebbieTracker-place">
           <h2 class="DebbieTracker-name">${place.name}</h2>
+          ${place.rainfall === null ? null : html`<div class="DebbieTracker-rainfall">
+            <div class="DebbieTracker-rainfall-value">${place.rainfall}</div>
+            <div class="DebbieTracker-rainfall-units">mm</div>
+            <div class="DebbieTracker-rainfall-context">rainfall since midnight</div>
+          </div>`}
           <div class="DebbieTracker-gust"><div id="DebbieTracker-gust-${place.slug}"></div></div>
         </div>
       `)}
@@ -157,11 +163,11 @@ places.forEach(place => {
         format: {
           Gust: (d, i, e) => {
             if (e === meta.numGusts - 1) {
-              return `${d} km/h`;
+              return `${d} kph`;
             }
 
             // if (d === place.maxGust) {
-            //   return `${d} km/h`;
+            //   return `${d} kph`;
             // }
 
             return '';
@@ -172,7 +178,7 @@ places.forEach(place => {
     tooltip: {
       format: {
         title: d => `${meta.gustTimes[d]}`,
-        value: d => `${d} km/h`
+        value: d => `${d} kph`
       }
     },
     axis: {

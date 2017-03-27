@@ -1,7 +1,18 @@
+$font-sans: "ProximaNova", "Interval Sans Pro", Arial, Helvetica, sans-serif;
+$rainfall-width: 56px;
+
 .DebbieTracker {
   position: relative;
   margin: 30px 0;
   padding: 20px 0 0;
+}
+
+.DebbieTracker-markers {
+  position: absolute;
+  top: 0;
+  right: $rainfall-width;
+  bottom: 0;
+  left: 0;
 }
 
 .DebbieTracker-marker {
@@ -19,7 +30,7 @@
   transform: translate(-50%, 0);
   color: #666;
   background-color: #f9f9f9;
-  font-family: "ProximaNova", "Interval Sans Pro", Arial, Helvetica, sans-serif;
+  font-family: $font-sans;
   font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
@@ -36,7 +47,7 @@
 
 .DebbieTracker-name {
   display: inline-block;
-  margin: 15px 0 -10px !important;
+  margin: 10px 0 0 !important;
   padding: 2px 0;
   font-size: 20px !important;
   font-weight: bold !important;
@@ -46,6 +57,43 @@
   .story.richtext & {
     background-color: #fff;
   }
+}
+
+.DebbieTracker-rainfall {
+  box-sizing: border-box;
+  float: right;
+  margin: 20px 0 0;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  padding: 7px 2px 3px;
+  width: $rainfall-width;
+  color: #666;
+  font-size: 11px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.DebbieTracker-rainfall-value {
+  color: #333;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 0.6;
+}
+
+.DebbieTracker-rainfall-units {
+  margin-bottom: 3px;
+  color: #666;
+  font-family: $font-sans;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.DebbieTracker-gust {
+  margin-top: -8px;
+  margin-right: $rainfall-width;
+  margin-bottom: 8px;
 }
 
 .c3-line {
