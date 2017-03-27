@@ -175,9 +175,9 @@ places.forEach(place => {
               return `${d} kph`;
             }
 
-            // if (d === place.maxGust) {
-            //   return `${d} kph`;
-            // }
+            if (d === place.maxGust) {
+              return `${d} kph`;
+            }
 
             return '';
           }
@@ -195,7 +195,7 @@ places.forEach(place => {
         show: false,
         padding: {
           top: 35,
-          bottom: 5
+          bottom: 15
         },
         max: meta.maxGust,
         min: meta.minGust
@@ -222,10 +222,24 @@ places.forEach(place => {
       .call(_d => {
         _d[0].forEach(d => {
           d3.select(d)
-          .style('opacity', c => {
+          .attr('r', c => {
             // return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
-            return c.x === meta.numGusts - 1 ? 1 : 0;
+            return c.x === meta.numGusts - 1 ? 2.5 : c.value === place.maxGust ? 4.5 : 0;
+          })
+          .style('opacity', c => {
+            return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
+            // return c.x === meta.numGusts - 1 ? 1 : 0;
           });
+        })
+      });
+      x.selectAll('.c3-texts-Gust text')
+      .call(_d => {
+        _d[0].forEach(d => {
+          d3.select(d)
+          .attr('dy', c => {
+            // return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
+            return c.x === meta.numGusts - 1 ? 21 : -3;
+          })
         })
       });
       x.selectAll('clipPath').remove();

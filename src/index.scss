@@ -105,6 +105,10 @@ $rainfall-width: 56px;
   font-weight: bold;
 }
 
+.c3-xgrid-focus[x1="0"] {
+    visibility: hidden !important;
+}
+
 .c3-tooltip th {
   border: none !important;
   padding: 2px 5px !important;
