@@ -3,9 +3,9 @@ const ns = require('util-news-selectors');
 
 const slice = Array.prototype.slice;
 
-const COLOR_LINE = '#333';
-const COLOR_MIN = '#00CED5';
-const COLOR_MAX = '#B7004E';
+const COLOR_LINE = '#999';
+const COLOR_MIN = '#007579';
+const COLOR_MAX = '#df005d';
 // const COLOR_MAX = '#F8076D';
 
 if (!d3 || !c3) {
