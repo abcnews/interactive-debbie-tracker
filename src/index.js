@@ -155,7 +155,7 @@ places.forEach((place, placeIndex) => {
   const chart = c3.generate({
     bindto: `#DebbieTracker-gust-${place.slug}`,
     size: {
-        height: 80,
+        height: 85,
     },
     padding: {
         top: 0,
@@ -203,7 +203,7 @@ places.forEach((place, placeIndex) => {
         show: false,
         padding: {
           top: 33,
-          bottom: 12
+          bottom: 17
         },
         max: meta.maxGust,
         min: meta.minGust
