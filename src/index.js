@@ -40,6 +40,8 @@ slice.call(tableEls[0].rows).forEach((row, rowIndex) => {
           gusts: [],
           maxGust: -Infinity,
           minGust: Infinity,
+          maxGustIndex: 0,
+          minGustIndex: 0
         });
         break;
       case 1:
@@ -63,12 +65,14 @@ slice.call(tableEls[1].rows).forEach((row, rowIndex) => {
 
     places[colIndex - 1].gusts.push({time: time, value: value});
 
-    if (value !== null && value > places[colIndex - 1].maxGust) {
+    if (value !== null && value >= places[colIndex - 1].maxGust) {
       places[colIndex - 1].maxGust = value;
+      places[colIndex - 1].maxGustIndex = rowIndex - 1;
     }
 
-    if (value !== null && value < places[colIndex - 1].minGust) {
+    if (value !== null && value <= places[colIndex - 1].minGust) {
       places[colIndex - 1].minGust = value;
+      places[colIndex - 1].minGustIndex = rowIndex - 1;
     }
   });
 
@@ -117,11 +121,14 @@ const appEl = html`
     <div class="DebbieTracker-markers">
       <div class="DebbieTracker-marker" style="left: 5.75%">
         <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
+        <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
       </div>
       <div class="DebbieTracker-marker" style="left: 49.25%">
         <div class="DebbieTracker-marker-label">${meta.gustTimes[Math.floor(meta.gustTimes.length / 2)]}</div>
+        <div class="DebbieTracker-marker-label">${meta.gustTimes[Math.floor(meta.gustTimes.length / 2)]}</div>
       </div>
       <div class="DebbieTracker-marker" style="left: 92.75%">
+        <div class="DebbieTracker-marker-label">${meta.gustTimes[meta.gustTimes.length - 1]}</div>
         <div class="DebbieTracker-marker-label">${meta.gustTimes[meta.gustTimes.length - 1]}</div>
       </div>
     </div>
@@ -171,12 +178,12 @@ places.forEach((place, placeIndex) => {
       },
       labels: {
         format: {
-          Gust: (d, i, e) => {
-            if (e === meta.numGusts - 1) {
+          Gust: (d, _, i) => {
+            if (i === meta.numGusts - 1) {
               return `${d} kph`;
             }
 
-            if (d === place.maxGust) {
+            if (i === place.maxGustIndex) {
               return `${d} kph`;
             }
 
@@ -226,13 +233,11 @@ places.forEach((place, placeIndex) => {
   gradient.append('stop')
     .attr('offset', '0%')
     .attr('stop-opacity', 1)
-    // .attr('stop-color', COLOR_MIN);
     .attr('stop-color', meta.gustColorScale(place.minGust));
 
   gradient.append('stop')
     .attr('offset', '100%')
     .attr('stop-opacity', 1)
-    // .attr('stop-color', COLOR_MAX);
     .attr('stop-color', meta.gustColorScale(place.maxGust));
 
   setInterval(() => {
@@ -243,12 +248,10 @@ places.forEach((place, placeIndex) => {
         _d[0].forEach(d => {
           d3.select(d)
           .attr('r', c => {
-            // return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
-            return c.value === place.maxGust ? 4.5 : c.x === meta.numGusts - 1 ? 2.5 : 0;
+            return c.x === meta.numGusts - 1 ? 4.5 : c.index === place.maxGustIndex ? 2.5 : 0;
           })
           .style('opacity', c => {
             return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
-            // return c.x === meta.numGusts - 1 ? 1 : 0;
           });
         })
       });
@@ -257,8 +260,7 @@ places.forEach((place, placeIndex) => {
         _d[0].forEach(d => {
           d3.select(d)
           .attr('dy', c => {
-            // return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
-            return c.value === place.maxGust ? -3 : 21;
+            return c.value === place.maxGust ? -1 : 23;
           })
         })
       });

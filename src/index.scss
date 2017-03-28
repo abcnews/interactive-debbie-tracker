@@ -4,7 +4,7 @@ $rainfall-width: 56px;
 .DebbieTracker {
   position: relative;
   margin: 30px 0;
-  padding: 20px 0 0;
+  padding: 20px 0 30px;
 }
 
 .DebbieTracker-markers {
@@ -38,6 +38,11 @@ $rainfall-width: 56px;
   .story.richtext & {
     background-color: #fff;
   }
+}
+
+.DebbieTracker-marker-label + .DebbieTracker-marker-label {
+  top: auto;
+  bottom: 0;
 }
 
 .DebbieTracker-places {
