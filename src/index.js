@@ -40,6 +40,7 @@ slice.call(tableEls[0].rows).forEach((row, rowIndex) => {
           gusts: [],
           maxGust: -Infinity,
           minGust: Infinity,
+          latestGustIndex: 0,
           maxGustIndex: 0,
           minGustIndex: 0
         });
@@ -74,13 +75,16 @@ slice.call(tableEls[1].rows).forEach((row, rowIndex) => {
       places[colIndex - 1].minGust = value;
       places[colIndex - 1].minGustIndex = rowIndex - 1;
     }
+
+    if (value !== null) {
+      places[colIndex - 1].latestGustIndex = rowIndex - 1;
+    }
   });
 
 });
 
 const meta = places.reduce((memo, place) => {
-  if (memo.numGusts == null) {
-    memo.numGusts = place.gusts.filter(gust => gust.value !== null).length;
+  if (memo.gustTimes == null) {
     memo.gustTimes = place.gusts.map(gust => gust.time);
   }
 
@@ -170,7 +174,6 @@ places.forEach((place, placeIndex) => {
       type: 'area-spline',
       color: (color, d) => {
         if (!d.value) {
-          // return COLOR_LINE;
           return `url(#gust-gradient-${placeIndex})`;
         }
 
@@ -179,7 +182,7 @@ places.forEach((place, placeIndex) => {
       labels: {
         format: {
           Gust: (d, _, i) => {
-            if (i === meta.numGusts - 1) {
+            if (i === place.latestGustIndex) {
               return `${d} kph`;
             }
 
@@ -248,10 +251,10 @@ places.forEach((place, placeIndex) => {
         _d[0].forEach(d => {
           d3.select(d)
           .attr('r', c => {
-            return c.x === meta.numGusts - 1 ? 4.5 : c.index === place.maxGustIndex ? 2.5 : 0;
+            return c.index === place.latestGustIndex ? 4.5 : c.index === place.maxGustIndex ? 2.5 : 0;
           })
           .style('opacity', c => {
-            return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
+            return (c.value === place.maxGust || c.index === place.latestGustIndex) ? 1 : 0;
           });
         })
       });
