@@ -100,13 +100,17 @@ $rainfall-width: 56px;
   stroke-width: 2px !important;
 }
 
+.c3-area-Gust {
+  fill: #bbb !important;
+}
+
 .c3-text {
   font-size: 11px;
   font-weight: bold;
 }
 
 .c3-xgrid-focus[x1="0"] {
-    visibility: hidden !important;
+  visibility: hidden !important;
 }
 
 .c3-tooltip th {

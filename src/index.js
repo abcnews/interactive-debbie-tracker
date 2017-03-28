@@ -115,7 +115,7 @@ meta.rainfallColorScale = d3.scale.linear().domain([meta.minRainfall, meta.maxRa
 const appEl = html`
   <div class="DebbieTracker">
     <div class="DebbieTracker-markers">
-      <div class="DebbieTracker-marker" style="left: 6%">
+      <div class="DebbieTracker-marker" style="left: 5.75%">
         <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
       </div>
       <div class="DebbieTracker-marker" style="left: 49.25%">
@@ -144,11 +144,11 @@ const appEl = html`
 teaserEl.parentElement.insertBefore(appEl, teaserEl);
 teaserEl.parentElement.removeChild(teaserEl);
 
-places.forEach(place => {
+places.forEach((place, placeIndex) => {
   const chart = c3.generate({
     bindto: `#DebbieTracker-gust-${place.slug}`,
     size: {
-        height: 65,
+        height: 80,
     },
     padding: {
         top: 0,
@@ -160,10 +160,11 @@ places.forEach(place => {
       columns: [
         ['Gust'].concat(place.gusts.map(gust => gust.value))
       ],
-      type: 'spline',
+      type: 'area-spline',
       color: (color, d) => {
         if (!d.value) {
-          return COLOR_LINE;
+          // return COLOR_LINE;
+          return `url(#gust-gradient-${placeIndex})`;
         }
 
         return meta.gustColorScale(d.value);
@@ -194,8 +195,8 @@ places.forEach(place => {
       y: {
         show: false,
         padding: {
-          top: 35,
-          bottom: 15
+          top: 33,
+          bottom: 12
         },
         max: meta.maxGust,
         min: meta.minGust
@@ -215,6 +216,25 @@ places.forEach(place => {
     }
   });
 
+  const gradient = d3.select(chart.element).select('defs').append('linearGradient')
+    .attr('x1', '0%')
+    .attr('y1', '100%')
+    .attr('x2', '0%')
+    .attr('y2', '0%')
+    .attr('id', `gust-gradient-${placeIndex}`);
+
+  gradient.append('stop')
+    .attr('offset', '0%')
+    .attr('stop-opacity', 1)
+    // .attr('stop-color', COLOR_MIN);
+    .attr('stop-color', meta.gustColorScale(place.minGust));
+
+  gradient.append('stop')
+    .attr('offset', '100%')
+    .attr('stop-opacity', 1)
+    // .attr('stop-color', COLOR_MAX);
+    .attr('stop-color', meta.gustColorScale(place.maxGust));
+
   setInterval(() => {
     d3.select(chart.element)
     .call(x => {
@@ -224,7 +244,7 @@ places.forEach(place => {
           d3.select(d)
           .attr('r', c => {
             // return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
-            return c.x === meta.numGusts - 1 ? 2.5 : c.value === place.maxGust ? 4.5 : 0;
+            return c.value === place.maxGust ? 4.5 : c.x === meta.numGusts - 1 ? 2.5 : 0;
           })
           .style('opacity', c => {
             return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
@@ -238,7 +258,7 @@ places.forEach(place => {
           d3.select(d)
           .attr('dy', c => {
             // return (c.value === place.maxGust || c.x === meta.numGusts - 1) ? 1 : 0;
-            return c.x === meta.numGusts - 1 ? 21 : -3;
+            return c.value === place.maxGust ? -3 : 21;
           })
         })
       });
