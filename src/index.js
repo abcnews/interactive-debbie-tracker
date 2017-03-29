@@ -4,9 +4,8 @@ const ns = require('util-news-selectors');
 const slice = Array.prototype.slice;
 
 const COLOR_LINE = '#999';
-const COLOR_MIN = '#007579';
-const COLOR_MAX = '#df005d';
-// const COLOR_MAX = '#F8076D';
+const COLOR_MIN = '#0097AB';
+const COLOR_MAX = '#FF6600';
 
 if (!d3 || !c3) {
   throw new Error('Dependencies not loaded');
@@ -30,122 +29,76 @@ if (tableEls.length === 0) {
 const places = [];
 
 slice.call(tableEls[0].rows).forEach((row, rowIndex) => {
-  slice.call(row.cells).forEach((cell, colIndex) => {
-    switch (rowIndex) {
-      case 0:
-        places.push({
-          name: cell.innerHTML,
-          slug: cell.innerHTML.toLowerCase().replace(' ', '-'),
-          rainfall: 0,
-          gusts: [],
-          maxGust: -Infinity,
-          minGust: Infinity,
-          latestGustIndex: 0,
-          maxGustIndex: 0,
-          minGustIndex: 0
-        });
-        break;
-      case 1:
-        places[colIndex].rainfall = cell.innerHTML === '-' ? null : +cell.innerHTML;
-        break;
-      default:
-        break;
-    }
-  });
-});
-
-slice.call(tableEls[1].rows).forEach((row, rowIndex) => {
   const time = row.cells[0].innerHTML;
 
-  slice.call(row.cells).forEach((cell, colIndex) => {
-    if (rowIndex === 0 || colIndex === 0) {
+  slice.call(row.cells, 1).forEach((cell, colIndex) => {
+    if (rowIndex === 0) {
+      places.push({
+        name: cell.innerHTML,
+        slug: cell.innerHTML.toLowerCase().replace(' ', '-'),
+        rainfalls: [],
+        maxRainfall: -Infinity,
+        latestRainfallIndex: 0
+      });
+
       return;
     }
 
-    const value = (+cell.innerHTML) || null;
+    const cellInt = parseInt(cell.innerHTML, 10);
+    const value = isNaN(cellInt) ? null : cellInt;
 
-    places[colIndex - 1].gusts.push({time: time, value: value});
+    places[colIndex].rainfalls.push({time: time, value: value});
 
-    if (value !== null && value >= places[colIndex - 1].maxGust) {
-      places[colIndex - 1].maxGust = value;
-      places[colIndex - 1].maxGustIndex = rowIndex - 1;
-    }
-
-    if (value !== null && value <= places[colIndex - 1].minGust) {
-      places[colIndex - 1].minGust = value;
-      places[colIndex - 1].minGustIndex = rowIndex - 1;
+    if (value !== null && value >= places[colIndex].maxRainfall) {
+      places[colIndex].maxRainfall = value;
     }
 
     if (value !== null) {
-      places[colIndex - 1].latestGustIndex = rowIndex - 1;
+      places[colIndex].latestRainfallIndex = rowIndex - 1;
     }
   });
 
 });
 
 const meta = places.reduce((memo, place) => {
-  if (memo.gustTimes == null) {
-    memo.gustTimes = place.gusts.map(gust => gust.time);
+  if (memo.rainfallTimes == null) {
+    memo.rainfallTimes = place.rainfalls.map(rainfall => rainfall.time);
   }
 
-  if (place.maxGust > memo.maxGust) {
-    memo.maxGust = place.maxGust;
-  }
-
-  if (place.minGust < memo.minGust) {
-    memo.minGust = place.minGust;
-  }
-
-  if (place.rainfall !== null && place.rainfall > memo.maxRainfall) {
-    memo.maxRainfall = place.rainfall;
-  }
-
-  if (place.rainfall !== null && place.rainfall < memo.minRainfall) {
-    memo.minRainfall = place.rainfall;
+  if (place.maxRainfall > memo.maxRainfall) {
+    memo.maxRainfall = place.maxRainfall;
   }
 
   return memo;
 }, {
-  maxGust: -Infinity,
-  minGust: Infinity,
-  maxRainfall: -Infinity,
-  minRainfall: Infinity
+  maxRainfall: -Infinity
 });
 
-meta.gustColorScale = d3.scale.linear().domain([meta.minGust, meta.maxGust])
-  .interpolate(d3.interpolateHcl)
-  .range([d3.rgb(COLOR_MIN), d3.rgb(COLOR_MAX)]);
-
-meta.rainfallColorScale = d3.scale.linear().domain([meta.minRainfall, meta.maxRainfall])
+meta.rainfallColorScale = d3.scale.linear().domain([0, meta.maxRainfall])
   .interpolate(d3.interpolateHcl)
   .range([d3.rgb(COLOR_MIN), d3.rgb(COLOR_MAX)]);
 
 const appEl = html`
   <div class="DebbieTracker">
     <div class="DebbieTracker-markers">
-      <div class="DebbieTracker-marker" style="left: 5.75%">
-        <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
-        <div class="DebbieTracker-marker-label">${meta.gustTimes[0]}</div>
+      <div class="DebbieTracker-marker" style="left: 5%">
+        <div class="DebbieTracker-marker-label">${meta.rainfallTimes[0]}</div>
+        <div class="DebbieTracker-marker-label">${meta.rainfallTimes[0]}</div>
       </div>
       <div class="DebbieTracker-marker" style="left: 49.25%">
-        <div class="DebbieTracker-marker-label">${meta.gustTimes[Math.floor(meta.gustTimes.length / 2)]}</div>
-        <div class="DebbieTracker-marker-label">${meta.gustTimes[Math.floor(meta.gustTimes.length / 2)]}</div>
+        <div class="DebbieTracker-marker-label">${meta.rainfallTimes[Math.floor(meta.rainfallTimes.length / 2)]}</div>
+        <div class="DebbieTracker-marker-label">${meta.rainfallTimes[Math.floor(meta.rainfallTimes.length / 2)]}</div>
       </div>
-      <div class="DebbieTracker-marker" style="left: 92.75%">
-        <div class="DebbieTracker-marker-label">${meta.gustTimes[meta.gustTimes.length - 1]}</div>
-        <div class="DebbieTracker-marker-label">${meta.gustTimes[meta.gustTimes.length - 1]}</div>
+      <div class="DebbieTracker-marker" style="left: 93.75%">
+        <div class="DebbieTracker-marker-label">${meta.rainfallTimes[meta.rainfallTimes.length - 1]}</div>
+        <div class="DebbieTracker-marker-label">${meta.rainfallTimes[meta.rainfallTimes.length - 1]}</div>
       </div>
     </div>
     <div class="DebbieTracker-places">
       ${places.map(place => html`
         <div class="DebbieTracker-place">
           <h2 class="DebbieTracker-name">${place.name}</h2>
-          ${place.rainfall === null ? null : html`<div class="DebbieTracker-rainfall">
-            <div class="DebbieTracker-rainfall-value" style="color: ${meta.rainfallColorScale(place.rainfall)}">${place.rainfall}</div>
-            <div class="DebbieTracker-rainfall-units">mm</div>
-            <div class="DebbieTracker-rainfall-context">rainfall since midnight</div>
-          </div>`}
-          <div class="DebbieTracker-gust"><div id="DebbieTracker-gust-${place.slug}"></div></div>
+          <div class="DebbieTracker-rainfall"><div id="DebbieTracker-rainfall-${place.slug}"></div></div>
         </div>
       `)}
     </div>
@@ -157,7 +110,7 @@ teaserEl.parentElement.removeChild(teaserEl);
 
 places.forEach((place, placeIndex) => {
   const chart = c3.generate({
-    bindto: `#DebbieTracker-gust-${place.slug}`,
+    bindto: `#DebbieTracker-rainfall-${place.slug}`,
     size: {
         height: 85,
     },
@@ -169,25 +122,21 @@ places.forEach((place, placeIndex) => {
     },
     data: {
       columns: [
-        ['Gust'].concat(place.gusts.map(gust => gust.value))
+        ['Rainfall'].concat(place.rainfalls.map(rainfall => rainfall.value))
       ],
       type: 'area-spline',
       color: (color, d) => {
         if (!d.value) {
-          return `url(#gust-gradient-${placeIndex})`;
+          return `url(#rainfall-gradient-${placeIndex})`;
         }
 
-        return meta.gustColorScale(d.value);
+        return meta.rainfallColorScale(d.value);
       },
       labels: {
         format: {
-          Gust: (d, _, i) => {
-            if (i === place.latestGustIndex) {
-              return `${d} kph`;
-            }
-
-            if (i === place.maxGustIndex) {
-              return `${d} kph`;
+          Rainfall: (d, _, i) => {
+            if (i === place.latestRainfallIndex) {
+              return `${d} mm`;
             }
 
             return '';
@@ -197,8 +146,8 @@ places.forEach((place, placeIndex) => {
     },
     tooltip: {
       format: {
-        title: d => `${meta.gustTimes[d]}`,
-        value: d => `${d} kph`
+        title: d => `${meta.rainfallTimes[d]}`,
+        value: d => `${d} mm`
       }
     },
     axis: {
@@ -208,8 +157,8 @@ places.forEach((place, placeIndex) => {
           top: 33,
           bottom: 17
         },
-        max: meta.maxGust,
-        min: meta.minGust
+        max: meta.maxRainfall,
+        min: 0
       },
       x: {
         type: 'category',
@@ -218,7 +167,7 @@ places.forEach((place, placeIndex) => {
           left: 1.5,
           right: 2
         },
-        categories: meta.gustTimes
+        categories: meta.rainfallTimes
       }
     },
     legend: {
@@ -231,17 +180,17 @@ places.forEach((place, placeIndex) => {
     .attr('y1', '100%')
     .attr('x2', '0%')
     .attr('y2', '0%')
-    .attr('id', `gust-gradient-${placeIndex}`);
+    .attr('id', `rainfall-gradient-${placeIndex}`);
 
   gradient.append('stop')
     .attr('offset', '0%')
     .attr('stop-opacity', 1)
-    .attr('stop-color', meta.gustColorScale(place.minGust));
+    .attr('stop-color', meta.rainfallColorScale(0));
 
   gradient.append('stop')
     .attr('offset', '100%')
     .attr('stop-opacity', 1)
-    .attr('stop-color', meta.gustColorScale(place.maxGust));
+    .attr('stop-color', meta.rainfallColorScale(place.maxRainfall));
 
   setInterval(() => {
     d3.select(chart.element)
@@ -251,20 +200,11 @@ places.forEach((place, placeIndex) => {
         _d[0].forEach(d => {
           d3.select(d)
           .attr('r', c => {
-            return c.index === place.latestGustIndex ? 4.5 : c.index === place.maxGustIndex ? 2.5 : 0;
+            return c.index === place.latestRainfallIndex ? 4.5 : 0;
           })
           .style('opacity', c => {
-            return (c.value === place.maxGust || c.index === place.latestGustIndex) ? 1 : 0;
+            return c.index === place.latestRainfallIndex ? 1 : 0;
           });
-        })
-      });
-      x.selectAll('.c3-texts-Gust text')
-      .call(_d => {
-        _d[0].forEach(d => {
-          d3.select(d)
-          .attr('dy', c => {
-            return c.value === place.maxGust ? -1 : 23;
-          })
         })
       });
       x.selectAll('clipPath').remove();

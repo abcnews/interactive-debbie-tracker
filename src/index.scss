@@ -1,5 +1,4 @@
 $font-sans: "ProximaNova", "Interval Sans Pro", Arial, Helvetica, sans-serif;
-$rainfall-width: 56px;
 
 .DebbieTracker {
   position: relative;
@@ -10,7 +9,7 @@ $rainfall-width: 56px;
 .DebbieTracker-markers {
   position: absolute;
   top: 0;
-  right: $rainfall-width;
+  right: 0;
   bottom: 0;
   left: 0;
 }
@@ -64,40 +63,8 @@ $rainfall-width: 56px;
   }
 }
 
-.DebbieTracker-rainfall {
-  box-sizing: border-box;
-  float: right;
-  margin: 20px 0 0;
-  border-radius: 3px;
-  border: 1px solid #ddd;
-  padding: 8px 2px 4px;
-  width: $rainfall-width;
-  color: #666;
-  font-size: 11px;
-  line-height: 1.1;
-  text-align: center;
-}
-
-.DebbieTracker-rainfall-value {
-  color: #333;
-  font-family: $font-sans;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 0.65;
-}
-
-.DebbieTracker-rainfall-units {
-  margin-bottom: 4px;
-  color: #666;
-  font-family: $font-sans;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.DebbieTracker-gust {
+.DebbieTracker-rain {
   margin-top: -8px;
-  margin-right: $rainfall-width;
   margin-bottom: 8px;
 }
 
@@ -105,7 +72,7 @@ $rainfall-width: 56px;
   stroke-width: 2px !important;
 }
 
-.c3-area-Gust {
+.c3-area-Rainfall {
   fill: #bbb !important;
 }
 
